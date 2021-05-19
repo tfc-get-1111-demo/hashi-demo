@@ -1,5 +1,5 @@
 module "hashi-demo" {
-  source          = "modules/mock-splunk"
+  source          = "./modules/mock-splunk"
   region          = var.region_primary
   mock_splunk     = var.mock_splunk
   instance_size   = var.instance_size
@@ -11,7 +11,7 @@ module "hashi-demo" {
 }
 
 module "hashi-demo-secondary" {
-  source          = "modules/mock-splunk"
+  source          = "./modules/mock-splunk"
   region          = var.region_secondary
   mock_splunk     = var.mock_splunk
   instance_size   = var.instance_size
