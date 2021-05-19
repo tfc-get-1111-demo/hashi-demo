@@ -1,24 +1,50 @@
-module "hashi-demo" {
-  source          = "./modules/mock-splunk"
-  region          = var.region_primary
-  mock_splunk     = var.mock_splunk
-  instance_size   = var.instance_size
-  instance_profile = aws_iam_instance_profile.splunk_instance_profile.id
-  subnet_id       = module.hashi-demo-vpc.public_subnets[0]
-  mandatory_tags  = var.mandatory_tags
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical
 }
 
-module "hashi-demo-secondary" {
-  source          = "./modules/mock-splunk"
-  region          = var.region_secondary
-  mock_splunk     = var.mock_splunk
-  instance_size   = var.instance_size
-  instance_profile = aws_iam_instance_profile.splunk_instance_profile.id
-  subnet_id       = module.hashi-demo-vpc-secondary.public_subnets[0]
-  mandatory_tags  = var.mandatory_tags
-  providers = {
-    aws = aws.secondary
+resource "aws_instance" "mock_splunk" {
+  ami                  = var.instance_ami
+  instance_type        = var.instance_size
+  iam_instance_profile = aws_iam_instance_profile.splunk_instance_profile.id
+  
+  network_interface {
+    network_interface_id = aws_network_interface.mock_splunk.id
+    device_index         = 0
   }
+
+  user_data     = file("${path.module}/templates/user-data.sh")
+
+  tags          = merge({
+      "Name" = "${var.mock_splunk}"
+    },
+    var.mandatory_tags)
+  }
+
+resource "aws_network_interface" "mock_splunk" {
+  subnet_id   = module.hashi-demo-vpc.public_subnets[0]
+  #private_ips = ["10.11.12.10"]
+
+  tags = merge({
+      "Name" = "primary_network_interface"
+    },
+    var.mandatory_tags)
+  }
+
+resource "aws_eip" "mock_splunk" {
+  instance = aws_instance.mock_splunk.id
+  vpc      = true
 }
 
 resource "aws_iam_role" "splunk_instance_profile_role" {
