@@ -239,6 +239,10 @@ module "hashi-demo-vpc-secondary" {
   enable_session_manager_endpoints        = var.enable_session_manager_endpoints
   flowlog_format                          = "$${version} $${account-id} $${interface-id} $${srcaddr} $${dstaddr} $${srcport} $${dstport} $${protocol} $${tcp-flags} $${packets} $${bytes} $${start} $${end} $${action} $${log-status}"
   tags                                    = var.mandatory_tags
+
+  providers = {
+    aws = aws.secondary
+  }
 }
 
 output "vpc_id_secondary" {
