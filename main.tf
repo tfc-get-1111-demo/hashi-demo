@@ -1,3 +1,28 @@
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
+
+resource "aws_instance" "rogue_instance" {
+  ami                  = data.aws_ami.ubuntu.id
+  instance_type        = var.instance_size
+  iam_instance_profile = var.instance_profile
+  
+  tags                 = {"Name" = "rogue_instance"}
+}
+
+
 module "hashi-demo" {
   source          = "./modules/mock-splunk"
   region          = var.region_primary
