@@ -8,7 +8,7 @@ module "hashi-demo" {
   mandatory_tags  = var.mandatory_tags
 }
 
-module "hashi-demo-secondary" {
+module "hashi-demo-secondary" { 
   source          = "./modules/mock-splunk"
   region          = var.region_secondary
   mock_splunk     = var.mock_splunk
