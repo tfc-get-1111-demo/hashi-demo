@@ -10,7 +10,7 @@ variable "instance_size" {
 
 variable "region_primary" {
   type    = string
-  default = "this should not update"
+  default = "us-east-1"
 }
 
 variable "region_secondary" {
